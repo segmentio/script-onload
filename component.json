@@ -1,0 +1,15 @@
+{
+  "name": "script-onload",
+  "repo": "segmentio/script-onload",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": ["index.js"],
+  "version": "0.0.1",
+  "dependencies": {},
+  "development": {
+    "visionmedia/mocha": "*",
+    "component/assert": "*",
+    "yields/gravy": "*"
+  }
+}
