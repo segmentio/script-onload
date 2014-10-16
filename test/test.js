@@ -13,4 +13,14 @@ describe('script-onload', function(){
       done();
     });
   });
+
+  it('should invoke the callback with error on error', function(done){
+    var el = document.createElement('script');
+    el.src = '/test/foo.js';
+    document.body.appendChild(el);
+    onload(el, function(err){
+      if (!err) return done(err);
+      done();
+    });
+  });
 });
