@@ -26,7 +26,7 @@ module.exports = function(el, fn){
 function add(el, fn){
   el.addEventListener('load', function(_, e){ fn(null, e); }, false);
   el.addEventListener('error', function(e){
-    var err = new Error('failed to load the script "' + el.src + '"');
+    var err = new Error('script error "' + el.src + '"');
     err.event = e;
     fn(err);
   }, false);
@@ -44,5 +44,10 @@ function attach(el, fn){
   el.attachEvent('onreadystatechange', function(e){
     if (!/complete|loaded/.test(el.readyState)) return;
     fn(null, e);
+  });
+  el.attachEvent('onerror', function(e){
+    var err = new Error('failed to load the script "' + el.src + '"');
+    err.event = e || window.event;
+    fn(err);
   });
 }
