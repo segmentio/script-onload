@@ -33,7 +33,7 @@ function add(el, fn){
 }
 
 /**
- * Attach evnet.
+ * Attach event.
  *
  * @param {Element} el
  * @param {Function} fn
