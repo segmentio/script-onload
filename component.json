@@ -2,9 +2,11 @@
   "name": "script-onload",
   "repo": "segmentio/script-onload",
   "version": "1.0.1",
-  "description": "call function when a script loads",
+  "description": "Call a function when a script loads.",
   "main": "index.js",
-  "scripts": ["index.js"],
+  "scripts": [
+    "index.js"
+  ],
   "dependencies": {},
   "development": {
     "visionmedia/mocha": "*",
