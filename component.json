@@ -9,8 +9,6 @@
   ],
   "dependencies": {},
   "development": {
-    "visionmedia/mocha": "*",
-    "component/assert": "*",
-    "yields/gravy": "*"
+    "component/assert": "*"
   }
 }

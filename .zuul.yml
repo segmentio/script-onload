@@ -1,0 +1,3 @@
+name: script-onload
+ui: mocha-bdd
+server: "./node_modules/.bin/http-server --silent -p $ZUUL_PORT test/support"
