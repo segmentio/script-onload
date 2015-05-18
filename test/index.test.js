@@ -20,23 +20,46 @@ var testUrl = fmt('%s//%s%s', location.protocol, location.hostname, location.por
  */
 
 describe('script-onload', function(){
+  // Declared by `script.js`
   mocha.globals(['works']);
 
-  it('should invoke the callback when the script loads', function(done){
+  var container;
+
+  beforeEach(function() {
+    container = document.createElement('div');
+    document.body.appendChild(container);
+  });
+
+  afterEach(function() {
+    document.body.removeChild(container);
+  });
+
+  it('should invoke `callback` when the script loads', function(done) {
     var el = document.createElement('script');
     el.src = fmt('%s/script.js', testUrl);
-    document.body.appendChild(el);
-    onload(el, function(err){
-      if (err) return done(err);
+    container.appendChild(el);
+    onload(el, function(error) {
+      assert.equal(error, null);
       assert.equal(window.works, 'yes');
       done();
     });
   });
 
-  it('should invoke the callback with error on error', function(done){
+  it('should invoke `callback` with the event', function(done) {
+    var el = document.createElement('script');
+    el.src = fmt('%s/script.js', testUrl);
+    container.appendChild(el);
+    onload(el, function(error, event) {
+      assert.equal(error, null);
+      assert.equal(typeof event, 'object');
+      done();
+    });
+ });
+
+  it('should invoke the callback with error on error', function(done) {
     var el = document.createElement('script');
     el.src = fmt('%s/nonexistent.js', testUrl);
-    document.body.appendChild(el);
+    container.appendChild(el);
     onload(el, function(error) {
       assert(error);
       done();
