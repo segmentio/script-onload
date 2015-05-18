@@ -1,53 +1,60 @@
+'use strict';
 
-// https://github.com/thirdpartyjs/thirdpartyjs-code/blob/master/examples/templates/02/loading-files/index.html
-
-/**
- * Invoke `fn(err)` when the given `el` script loads.
- *
- * @param {Element} el
- * @param {Function} fn
- * @api public
- */
-
-module.exports = function(el, fn){
-  return el.addEventListener
-    ? add(el, fn)
-    : attach(el, fn);
-};
+// Credit: https://github.com/thirdpartyjs/thirdpartyjs-code/blob/master/examples/templates/02/loading-files/index.html
 
 /**
- * Add event listener to `el`, `fn()`.
+ * Attach load event to `el` (IE >= 11, other major browsers).
  *
- * @param {Element} el
- * @param {Function} fn
  * @api private
+ * @param {Element} element
+ * @param {Function} callback
  */
 
-function add(el, fn){
-  el.addEventListener('load', function(_, e){ fn(null, e); }, false);
-  el.addEventListener('error', function(e){
-    var err = new Error('script error "' + el.src + '"');
-    err.event = e;
-    fn(err);
+function add(element, callback) {
+  element.addEventListener('load', function(event) {
+    callback(null, event);
+  }, false);
+  element.addEventListener('error', function(event) {
+    var error = new Error('script error "' + element.src + '"');
+    error.event = event;
+    callback(error);
   }, false);
 }
 
 /**
- * Attach event.
+ * Attach event (IE <= 10).
  *
- * @param {Element} el
- * @param {Function} fn
  * @api private
+ * @param {Element} element
+ * @param {Function} callback
  */
 
-function attach(el, fn){
-  el.attachEvent('onreadystatechange', function(e){
-    if (!/complete|loaded/.test(el.readyState)) return;
-    fn(null, e);
+function attach(element, callback) {
+  element.attachEvent('onreadystatechange', function(event) {
+    if (!/complete|loaded/.test(element.readyState)) return;
+    callback(null, event);
   });
-  el.attachEvent('onerror', function(e){
-    var err = new Error('failed to load the script "' + el.src + '"');
-    err.event = e || window.event;
-    fn(err);
+  element.attachEvent('onerror', function(event) {
+    var error = new Error('failed to load the script "' + element.src + '"');
+    error.event = event || window.event;
+    callback(error);
   });
 }
+
+/**
+ * Invoke `callback(err, event)` when the given `element` script loads.
+ *
+ * @api public
+ * @param {Element} element
+ * @param {Function(err, event)} callback
+ */
+
+function onLoad(element, callback) {
+  return (element.addEventListener ? add : attach)(element, callback);
+}
+
+/**
+ * Exports.
+ */
+
+module.exports = onLoad;

@@ -1,41 +1,60 @@
+#
+# Binaries.
+#
 
-BROWSERS="chrome, safari, firefox, ie6..11"
-BINS=node_modules/.bin
-URL=http://localhost:3000/test
-P=$(BINS)/mocha-phantomjs
-C=$(BINS)/component
-S=$(BINS)/serve
-G=$(BINS)/gravy
+ZUUL = ./node_modules/.bin/zuul
 
-build: node_modules index.js components
-	@$(C) build --dev
+#
+# Files.
+#
 
-components: component.json
-	@$(C) install --dev
+SRCS = index.js
+TESTS = test/index.test.js
 
-test: server build
-	@open $(URL)
+#
+# Task arguments.
+#
 
-test-phantom: server build
-	@$(P) $(URL)
+BROWSER_NAME ?= chrome
+BROWSER_VERSION ?= latest
+PORT ?= 0
+ZUUL_ARGS =
 
-test-sauce: server build
-	@BROWSERS=$(BROWSERS) $(G) --url $(URL)
+#
+# Tasks.
+#
 
-node_modules: package.json
+# Install node dependencies.
+node_modules: package.json $(node_modules/*/package.json)
 	@npm install
 
-server: kill
-	@$(S) . &> /dev/null & echo $$! > test/pid
-	@sleep 1
-
-kill:
-	@-test -e test/pid \
-		&& kill `cat test/pid` \
-		&& rm -f test/pid
-
-clean: kill
-	rm -rf components build
-
+# Remove temporary files and build artifacts.
+clean:
+	rm -rf *.log build
 .PHONY: clean
 
+# Remove temporary files, build artifacts, and vendor files.
+distclean: clean
+	@rm -rf components node_modules
+.PHONY: distclean
+
+# Run tests in a browser. Defaults to a local browser.
+# To run on Sauce Labs, set SAUCE_USERNAME and SAUCE_ACCESS_KEY.
+ifdef SAUCE_USERNAME
+test-browser: ZUUL_ARGS += --browser-name $(BROWSER_NAME) --browser-version $(BROWSER_VERSION)
+else
+test-browser: ZUUL_ARGS += --local $(PORT)
+endif
+test-browser: node_modules
+	@$(ZUUL) $(ZUUL_ARGS) -- $(TESTS)
+.PHONY: test-browser
+
+# Run tests in PhantomJS.
+test-phantom: node_modules
+	@$(ZUUL) --phantom $(ZUUL_ARGS) -- $(TESTS)
+.PHONY: test-phantom
+
+# Test shortcut.
+test: test-phantom
+.PHONY: test
+.DEFAULT_GOAL = test

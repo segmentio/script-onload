@@ -1,0 +1,1 @@
+window.works = 'yes';
